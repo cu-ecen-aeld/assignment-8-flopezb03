@@ -23,8 +23,12 @@ S = "${WORKDIR}/git"
 
 inherit module
 
-#EXTRA_OEMAKE:append:task-install = " -C ${STAGING_KERNEL_DIR} M=${S}"
-# Unable to find means of passing kernel path into install makefile - if kernel path is hardcoded you will need to patch the makefile. Note that the variable KERNEL_SRC will be passed in as the kernel source path.
+
+inherit update-rc.d
+INITSCRIPT_NAME:${PN} = "scull-init"
+INITSCRIPT_PACKAGES = "${PN}"
+SRC_URI += "file://scull-init"
+
 
 do_compile() {
     #oe_runmake -C ${S} KERNELDIR=${STAGING_KERNEL_DIR} 
@@ -33,6 +37,9 @@ do_compile() {
 
 do_install() {
     install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
-
     install -m 0644 ${S}/scull/*.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+
+    install -d ${D}${sysconfdir}/init.d
+    install -m 0755 ${WORKDIR}/scull-init ${D}${sysconfdir}/init.d/
 }
+FILES:${PN} += "${sysconfdir}/init.d/scull-init"

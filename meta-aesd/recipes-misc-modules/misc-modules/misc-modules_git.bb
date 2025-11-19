@@ -25,4 +25,14 @@ inherit module
 
 EXTRA_OEMAKE += "KERNELDIR=${STAGING_KERNEL_DIR}"
 
+inherit update-rc.d
+INITSCRIPT_NAME:${PN} = "misc-modules-init"
+INITSCRIPT_PACKAGES = "${PN}"
+SRC_URI += "file://misc-modules-init"
+
+do_install:append() {
+    install -d ${D}${sysconfdir}/init.d
+    install -m 0755 ${WORKDIR}/misc-modules-init ${D}${sysconfdir}/init.d/
+}
+FILES:${PN} += "${sysconfdir}/init.d/misc-modules-init"
 
